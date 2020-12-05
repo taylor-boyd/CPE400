@@ -14,9 +14,9 @@ class Graph():
                     for row in range(vertices)] 
   
     def printSolution(self, dist): 
-        print "Vertex \tDistance from Source"
+        print ("Vertex \tDistance from Source")
         for node in range(self.V): 
-            print node, "\t", dist[node] 
+            print (node, "\t", dist[node])
   
     # A utility function to find the vertex with  
     # minimum distance value, from the set of vertices  
@@ -24,7 +24,8 @@ class Graph():
     def minDistance(self, dist, sptSet): 
   
         # Initilaize minimum distance for next node 
-        min = sys.maxint 
+        # Sys.maxint doesnt work anymore :(
+        min = sys.maxsize
   
         # Search not nearest vertex not in the  
         # shortest path tree 
@@ -40,7 +41,7 @@ class Graph():
     # using adjacency matrix representation 
     def dijkstra(self, src): 
   
-        dist = [sys.maxint] * self.V 
+        dist = [sys.maxsize] * self.V 
         dist[src] = 0
         sptSet = [False] * self.V 
   
