@@ -59,7 +59,7 @@ def layout(nodes):
     return hub, one_hop
 
 # 'runs' the network / starts sending packets
-def sendPackets(hub, one_hop):
+def sendPackets(hub, one_hop, dest):
 
     packets = 0 # var for how many packets were sent before failure
 
@@ -72,12 +72,16 @@ def sendPackets(hub, one_hop):
 
     return packets
 
+# destination / gateway variable
+# val at each index is dest's dist from node (node # = index)
+dest = [2, 10, 12, 3]
+
 # sensor nodes - I set processing_pwr to 0 for all of them 
 # cuz i haven't implement it yet
 n0 = Node(10, 5, 0, [0, 2, 3, 5])
 n1 = Node(8, 5, 0, [2, 0, 2, 6])
-n2 = Node(3, 3, 0, [3, 2, 0, 0])
-n3 = Node(8, 5, 0, [5, 6, 0, 0])
+n2 = Node(3, 3, 0, [3, 2, 0, 10])
+n3 = Node(8, 5, 0, [5, 6, 10, 0])
 
 # list of nodes so it's easy to pass them to a function
 nodes = [n0, n1, n2, n3]
