@@ -2,12 +2,14 @@ from collections import defaultdict
 
 class Node():
 
-    def __init__(self, energy, transmit_pwr, processing_pwr):
+    def __init__(self, energy, transmit_pwr, processing_pwr, node_dist):
         self.energy = energy
         self.transmit_pwr = transmit_pwr
         self.processing_pwr = processing_pwr
+        self.distances = node_dist
 
 class Graph(): 
+
     def __init__(self, vertices): 
         self.V = vertices
         self.graph = defaultdict(list)
@@ -41,46 +43,37 @@ class Graph():
 
         print("GRAPH:" , self.graph)
 
-# takes in graph of nodes (so node items and their distances from each other)
+# takes in nodes 
 # returns network layout
-# we can also use this function to update/change the layout as energy depletes
-def layout(graph):
+# can use this function to update/change the layout as energy depletes
+def layout(nodes):
     network = [] 
-    # ^idk what data structure would be best here, we basically 
-    # need to store which nodes will serve as hubs and which 
-    # nodes report to each hub
-    # I think all the 'hubs' will need to have the transmission power
-    # to communicate w one another so that info can come from 
-    # anywhere and travel to anywhere 
 
     return network
 
-#def optimalPath()
+# 'runs' the network / starts sending packets
+def sendPackets(network):
 
-# This is graph similar to what i posted in discord
-g = Graph(8)
-g.addEdge(0,1)
-g.addEdge(0,3)
-g.addEdge(0,2)
-g.addEdge(1,3)
-g.addEdge(2,4)
-g.addEdge(2,7)
-g.addEdge(3,4)
-g.addEdge(3,5)
-g.addEdge(4,7)
-g.addEdge(4,6)
-g.addEdge(5,6)
+    packets = 0 # var for how many packets were sent before failure
+    
+    # parameter is how many vertices (nodes)
+    #g = Graph(2)
+    # node 0 can go to node 1
+    #g.addEdge(0,1)
+    #s = 0 ; d = 1
+    #g.printAllPaths(s, d)
 
-s = 0 ; d = 4
-g.printAllPaths(s, d)
+    return packets
 
-# first, we'd take in a graph and create node items accordingly
-# then, we'd call layout function to organize the network
-# next, we'd call a function that will 'run' the network and
-# choose optimal paths for each node to report to the main location
-# (or gateway). It'd basically keep running until it gets to 
-# some point (we have to decide what this point is) where one
-# of the hub nodes is running out of energy and must be converted
-# to a single-hope type. At this time, we would call the layout
-# function once again to see if we can rearrange the network
-# in order to make the energy last longer
+# sensor nodes - I set processing_pwr to 0 for all of them 
+# cuz i haven't implement it yet
+n0 = Node(10, 5, 0, [0, 2, 3, 5])
+n1 = Node(8, 5, 0, [2, 0, 2, 6])
+n2 = Node(3, 3, 0, [3, 2, 0, 0])
+n3 = Node(8, 5, 0, [5, 6, 0, 0])
+
+# list of nodes so it's easy to pass them to a function
+nodes = [n0, n1, n2, n3]
+
+# create initial network layout
+network = layout(nodes)
