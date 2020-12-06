@@ -13,12 +13,12 @@ class Graph():
         self.graph = [[0 for column in range(vertices)]  
                     for row in range(vertices)] 
   
-<<<<<<< Updated upstream
     def printSolution(self, dist): 
-        print "Vertex \tDistance from Source"
+        print ("Vertex \tDistance from Source")
         for node in range(self.V): 
+
             print node, "\t", dist[node] 
-=======
+
     def printSolution(self, dist, Path): 
         # First col is vertex, second is distance from src to vertex, third is prev node
         print ("Vertex \tDist  \tPrev Node")
@@ -39,7 +39,7 @@ class Graph():
         optimalPath.reverse()
         optimalPath.append(target)
         print ("OPTIMAL PATH TO TARGET " + str(target) + ": " + str(optimalPath))
->>>>>>> Stashed changes
+        print (node, "\t", dist[node])
   
     # A utility function to find the vertex with  
     # minimum distance value, from the set of vertices  
@@ -47,7 +47,8 @@ class Graph():
     def minDistance(self, dist, sptSet): 
   
         # Initilaize minimum distance for next node 
-        min = sys.maxint 
+        # Sys.maxint doesnt work anymore :(
+        min = sys.maxsize
   
         # Search not nearest vertex not in the  
         # shortest path tree 
@@ -63,7 +64,7 @@ class Graph():
     # using adjacency matrix representation 
     def dijkstra(self, src): 
   
-        dist = [sys.maxint] * self.V 
+        dist = [sys.maxsize] * self.V 
         dist[src] = 0
         sptSet = [False] * self.V 
   
@@ -97,15 +98,7 @@ g.graph = [[0, 4, 0, 0, 0, 0, 0, 8, 0],
         [0, 0, 0, 9, 0, 10, 0, 0, 0], 
         [0, 0, 4, 14, 10, 0, 2, 0, 0], 
         [0, 0, 0, 0, 0, 2, 0, 1, 6], 
-        [8, 11, 0, 0, 0, 0, 1, 0, 7], 
-<<<<<<< Updated upstream
-        [0, 0, 2, 0, 0, 0, 6, 7, 0] 
-        ]; 
-  
-g.dijkstra(0); 
-=======
+        [8, 11, 0, 0, 0, 0, 1, 0, 7],  
         [0, 0, 2, 0, 0, 0, 6, 7, 0]]; 
- 
-# First is src, second is target
-g.dijkstra(0, 8); 
->>>>>>> Stashed changes
+
+g.dijkstra(0); 
