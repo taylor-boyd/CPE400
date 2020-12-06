@@ -35,7 +35,18 @@ class Graph():
         # First col is vertex, second is distance from src to vertex, third is prev node
         print ("Vertex \tDistance Prev Node")
         for node in range(self.V): 
+<<<<<<< HEAD
             print (node, "\t", dist[node], "\t", Path[node])
+=======
+
+            print node, "\t", dist[node] 
+
+    def printSolution(self, dist, Path): 
+        # First col is vertex, second is distance from src to vertex, third is prev node
+        print ("Vertex \tDist  \tPrev Node")
+        for node in range(self.V): 
+            print (str(node) + '\t' + str(dist[node]) + '\t' + str(Path[node]))
+>>>>>>> 290616bcc7d1ebb4635db03b19e119fbe5f9f819
     
     # Get optimal path from dijkstras yay!!
     def getOptimalPath(self, Path, src, target):
@@ -50,7 +61,12 @@ class Graph():
         # Add target to the end
         optimalPath.reverse()
         optimalPath.append(target)
+<<<<<<< HEAD
         print ("OPTIMAL PATH TO TARGET" , target,":", optimalPath)
+=======
+        print ("OPTIMAL PATH TO TARGET " + str(target) + ": " + str(optimalPath))
+        print (node, "\t", dist[node])
+>>>>>>> 290616bcc7d1ebb4635db03b19e119fbe5f9f819
   
     # A utility function to find the vertex with  
     # minimum distance value, from the set of vertices  
@@ -119,9 +135,16 @@ g.graph = [[0, 4, 0, 0, 0, 0, 0, 8, 0],
         [0, 0, 0, 9, 0, 10, 0, 0, 0], 
         [0, 0, 4, 14, 10, 0, 2, 0, 0], 
         [0, 0, 0, 0, 0, 2, 0, 1, 6], 
+<<<<<<< HEAD
         [8, 11, 0, 0, 0, 0, 1, 0, 7], 
         [0, 0, 2, 0, 0, 0, 6, 7, 0] 
         ]; 
  
 # First is src, second is target
 g.dijkstra(0, 8); 
+=======
+        [8, 11, 0, 0, 0, 0, 1, 0, 7],  
+        [0, 0, 2, 0, 0, 0, 6, 7, 0]]; 
+
+g.dijkstra(0); 
+>>>>>>> 290616bcc7d1ebb4635db03b19e119fbe5f9f819
