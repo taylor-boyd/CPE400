@@ -12,6 +12,7 @@ from collections import defaultdict
 # From here
 # https://www.geeksforgeeks.org/find-paths-given-source-destination/
 # Should probably change so we aren't accused of cheating LOL
+
 class Node():
 
     def __init__(self, energy, transmit_pwr, processing_pwr, node_dist):
@@ -20,108 +21,128 @@ class Node():
         self.processing_pwr = processing_pwr
         self.distances = node_dist
 
-class Graph(): 
 
-    def __init__(self, vertices): 
-        self.V = vertices
-        self.graph = defaultdict(list)
 
-    def addEdge(self, u, v):
-        self.graph[u].append(v)
 
-    def printAllPathsUtil(self, u, d, visited, path):
+def addEdge(u, v):
+    graph[u].append(v)
 
-        visited[u] = True
-        path.append(u)
+def printAllPathsUtil(u, d, visited, path):
+
+    visited[u] = True
+    path.append(u)
+    
+    # If node equals destination
+    if u == d:
+        print (path)
+    else:
         
-        # If node equals destination
-        if u == d:
-            print (path)
-        else:
+        # Add path if the node hasn't been visited from source to dest
+        for i in graph[u]:
+            if visited[i] == False:
+                printAllPathsUtil(i, d, visited, path)
 
-            for i in self.graph[u]:
-                if visited[i] == False:
-                    self.printAllPathsUtil(i, d, visited, path)
+    path.pop()
 
-        path.pop()
-        visited[u] = False
+    visited[u] = False
 
-    def printAllPaths(self, s, d):
-        visited = [False] * (self.V)
+def printAllPaths(s, d):
+    visited = [False] * (V)
 
-        path = []
+    path = []
+    printAllPathsUtil(s, d, visited, path)
 
-        self.printAllPathsUtil(s, d, visited, path)
 
-        print("GRAPH:" , self.graph)
+       
 
 # takes in graph of nodes (so node items and their distances from each other)
 # takes in nodes 
 # returns network layout
 # can use this function to update/change the layout as energy depletes
 def layout(nodes):
-
-    hub = nodes[0]
+   
+    # Get all possible hubs and all possible one_hops
+    hubs = nodes
     one_hop = []
     for n in nodes:
+        # If any other node is greater than example hub, than that hub should be the node
         if n.transmit_pwr > hub.transmit_pwr:
             hub = n
         else:
+            # Else small power can only do one hop
             one_hop.append(n)
 
     return hub, one_hop
 
 # def optimalPath()
 
-# This is graph similar to what i posted in discord
-g = Graph(8)
-g.addEdge(0,1)
-g.addEdge(0,3)
-g.addEdge(0,2)
-g.addEdge(1,3)
-g.addEdge(2,4)
-g.addEdge(2,7)
-g.addEdge(3,4)
-g.addEdge(3,5)
-g.addEdge(4,7)
-g.addEdge(4,6)
-g.addEdge(5,6)
 
-s = 0 ; d = 4
-g.printAllPaths(s, d)
-# first, we'd take in a graph and create node items accordingly
-# then, we'd call layout function to organize the network
-# next, we'd call a function that will 'run' the network and
-# choose optimal paths for each node to report to the main location
-# (or gateway). It'd basically keep running until it gets to 
-# some point (we have to decide what this point is) where one
-# of the hub nodes is running out of energy and must be converted
-# to a single-hope type. At this time, we would call the layout
-# function once again to see if we can rearrange the network
-# in order to make the energy last longer
-# 'runs' the network / starts sending packets
 def sendPackets(hub, one_hop):
 
     packets = 0 # var for how many packets were sent before failure
 
-    # parameter is how many vertices (nodes)
-    #g = Graph(2)
-    # node 0 can go to node 1
-    #g.addEdge(0,1)
-    #s = 0 ; d = 1
-    #g.printAllPaths(s, d)
-
     return packets
+
+
+# def getOptimalPaths(nodes, src, dest):
+
+
+
+V = 4
+graph = defaultdict(list)
+
+possiblePaths = []
+
+
 
 # sensor nodes - I set processing_pwr to 0 for all of them 
 # cuz i haven't implement it yet
-n0 = Node(10, 5, 0, [0, 2, 3, 5])
-n1 = Node(8, 5, 0, [2, 0, 2, 6])
-n2 = Node(3, 3, 0, [3, 2, 0, 0])
-n3 = Node(8, 5, 0, [5, 6, 0, 0])
 
+# Last column is node distances from each node, 0 means 0 away from node at index
+# n0 = Node(10, 5, 3, [0, 2, 3, 5])
+# n1 = Node(8, 5, 3, [2, 0, 2, 6])
+# n2 = Node(3, 3, 1, [3, 2, 0, 0])
+# n3 = Node(8, 5, 2, [5, 6, 0, 0])
+
+n0 = Node(10, 5, 3, [1,2,3])
+n1 = Node(8,5,3, [0,2,3])
+n2 = Node(3,3,1, [0,1])
+n3 = Node(8,5,2,[0,1])
+
+
+# IDEALLY I WANT TO USE THE ADJACENCY MATRIX TO GET ALL POSSIBLE PATHS, BUT IM TOO SMALL BRAIN
+# SO I USED THIS
+
+addEdge(0,1)
+addEdge(0,2)
+addEdge(0,3)
+addEdge(1,0)
+addEdge(1,2)
+addEdge(1,3)
+addEdge(2,0)
+addEdge(2,1)
+addEdge(3,0)
+addEdge(3,1)
+
+Source = 0 
+Destination = 3
+
+# print ("POSSIBLE: ", possiblePaths)
 # list of nodes so it's easy to pass them to a function
 nodes = [n0, n1, n2, n3]
+nodesDistanceList = []
+nodesDistanceList.append(n0.distances)
+nodesDistanceList.append(n1.distances)
+nodesDistanceList.append(n2.distances)
+nodesDistanceList.append(n3.distances)
+
+possiblePaths = [[]]
+printAllPaths(Source,Destination)
+
+print ("GRAPH IS: ", graph)
+
+# getOptimalPaths(nodesDistanceList,0, 3)
+
 
 # create initial network layout
 network = layout(nodes)
@@ -129,4 +150,8 @@ hub, one_hop = layout(nodes)
 
 # start sending packets
 total_packets = 0
-total_packets.append(sendPackets(hub, one_hop))
+
+# First packet 
+firstPacketTEST = 768 # 768 bytes
+
+
