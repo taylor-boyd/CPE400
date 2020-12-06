@@ -1,6 +1,5 @@
 from collections import defaultdict 
 
-<<<<<<< HEAD
 # IDEA 2
 # Get all possible routes from source to destination
 # To some calculations to find the least energy consumed power for each node
@@ -13,8 +12,6 @@ from collections import defaultdict
 # From here
 # https://www.geeksforgeeks.org/find-paths-given-source-destination/
 # Should probably change so we aren't accused of cheating LOL
-=======
->>>>>>> 290616bcc7d1ebb4635db03b19e119fbe5f9f819
 class Node():
 
     def __init__(self, energy, transmit_pwr, processing_pwr):
@@ -56,8 +53,6 @@ class Graph():
 
         print("GRAPH:" , self.graph)
 
-<<<<<<< HEAD
-=======
 # takes in graph of nodes (so node items and their distances from each other)
 # returns network layout
 # we can also use this function to update/change the layout as energy depletes
@@ -74,7 +69,6 @@ def layout(graph):
 
 def optimalPath()
 
->>>>>>> 290616bcc7d1ebb4635db03b19e119fbe5f9f819
 # This is graph similar to what i posted in discord
 g = Graph(8)
 g.addEdge(0,1)
@@ -91,9 +85,6 @@ g.addEdge(5,6)
 
 s = 0 ; d = 4
 g.printAllPaths(s, d)
-<<<<<<< HEAD
-=======
-
 # first, we'd take in a graph and create node items accordingly
 # then, we'd call layout function to organize the network
 # next, we'd call a function that will 'run' the network and
@@ -104,4 +95,3 @@ g.printAllPaths(s, d)
 # to a single-hope type. At this time, we would call the layout
 # function once again to see if we can rearrange the network
 # in order to make the energy last longer
->>>>>>> 290616bcc7d1ebb4635db03b19e119fbe5f9f819
