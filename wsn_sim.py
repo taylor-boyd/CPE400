@@ -1,20 +1,5 @@
 import sys 
 
-# IDEA 1 
-# Instead of distances from each node (the weights), we make the weights
-# as energy consumed from that node, so ex: weight from node A to node {NEIGHBOR}
-# is energy consumated rate (or some kind of equation to tell us if we used a lot of energy at that node)
-# from node A to any neighboring node. We can then find the destination with dijkstras
-# by finding the path that picks the smallest energy consumed rate.
-
-# To find that initial energy consumed rate we can use equations from the PDF ima link, and
-# we can maybe use some kind of math involving the packet size * (equation involving transmission
-# and processing ; all other power)
-
-# WHAT IF (not sure if this works) we send a packet that holds the integer of the packet
-# to be sent (so no big data being processed) to find the initial energy consumed rate
-# for each node? Maybe!
-
 class Node():
 
     def __init__(self, energy, transmit_pwr, processing_pwr):
@@ -33,6 +18,7 @@ class Graph():
   
     def printSolution(self, dist, Path): 
         # First col is vertex, second is distance from src to vertex, third is prev node
+<<<<<<< HEAD
         print ("Vertex \tDistance Prev Node")
         for node in range(self.V): 
 <<<<<<< HEAD
@@ -47,6 +33,11 @@ class Graph():
         for node in range(self.V): 
             print (str(node) + '\t' + str(dist[node]) + '\t' + str(Path[node]))
 >>>>>>> 290616bcc7d1ebb4635db03b19e119fbe5f9f819
+=======
+        print ("Vertex \tDist  \tPrev Node")
+        for node in range(self.V): 
+            print (str(node) + '\t' + str(dist[node]) + '\t' + str(Path[node]))
+>>>>>>> main
     
     # Get optimal path from dijkstras yay!!
     def getOptimalPath(self, Path, src, target):
@@ -62,11 +53,16 @@ class Graph():
         optimalPath.reverse()
         optimalPath.append(target)
 <<<<<<< HEAD
+<<<<<<< HEAD
         print ("OPTIMAL PATH TO TARGET" , target,":", optimalPath)
 =======
         print ("OPTIMAL PATH TO TARGET " + str(target) + ": " + str(optimalPath))
         print (node, "\t", dist[node])
 >>>>>>> 290616bcc7d1ebb4635db03b19e119fbe5f9f819
+=======
+
+        print ("OPTIMAL PATH TO TARGET " + str(target) + ": " + str(optimalPath))
+>>>>>>> main
   
     # A utility function to find the vertex with  
     # minimum distance value, from the set of vertices  
@@ -136,6 +132,7 @@ g.graph = [[0, 4, 0, 0, 0, 0, 0, 8, 0],
         [0, 0, 4, 14, 10, 0, 2, 0, 0], 
         [0, 0, 0, 0, 0, 2, 0, 1, 6], 
 <<<<<<< HEAD
+<<<<<<< HEAD
         [8, 11, 0, 0, 0, 0, 1, 0, 7], 
         [0, 0, 2, 0, 0, 0, 6, 7, 0] 
         ]; 
@@ -148,3 +145,10 @@ g.dijkstra(0, 8);
 
 g.dijkstra(0); 
 >>>>>>> 290616bcc7d1ebb4635db03b19e119fbe5f9f819
+=======
+        [8, 11, 0, 0, 0, 0, 1, 0, 7], 
+        [0, 0, 2, 0, 0, 0, 6, 7, 0]]; 
+  
+# First is src, second is target
+g.dijkstra(0, 8)
+>>>>>>> main
