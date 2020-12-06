@@ -47,15 +47,22 @@ class Graph():
 # returns network layout
 # can use this function to update/change the layout as energy depletes
 def layout(nodes):
-    network = [] 
 
-    return network
+    hub = nodes[0]
+    one_hop = []
+    for n in nodes:
+        if n.transmit_pwr > hub.transmit_pwr:
+            hub = n
+        else:
+            one_hop.append(n)
+
+    return hub, one_hop
 
 # 'runs' the network / starts sending packets
-def sendPackets(network):
+def sendPackets(hub, one_hop):
 
     packets = 0 # var for how many packets were sent before failure
-    
+
     # parameter is how many vertices (nodes)
     #g = Graph(2)
     # node 0 can go to node 1
@@ -76,4 +83,8 @@ n3 = Node(8, 5, 0, [5, 6, 0, 0])
 nodes = [n0, n1, n2, n3]
 
 # create initial network layout
-network = layout(nodes)
+hub, one_hop = layout(nodes)
+
+# start sending packets
+total_packets = 0
+total_packets.append(sendPackets(hub, one_hop))
