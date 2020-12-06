@@ -55,7 +55,7 @@ def layout(graph):
 
     return network
 
-def optimalPath()
+#def optimalPath()
 
 # This is graph similar to what i posted in discord
 g = Graph(8)
