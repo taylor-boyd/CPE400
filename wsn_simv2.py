@@ -1,12 +1,20 @@
+import random
 from collections import defaultdict 
 
+# TO-DO: Add a routing table (probably should just be a list of lists to keep it simple) to 
+# the node class so that we can begin to implement RREQ stuff
 class Node():
 
-    def __init__(self, energy, transmit_pwr, processing_pwr, node_dist):
+    def __init__(self, id, energy, node_dist):
+        self.id = id
         self.energy = energy
-        self.transmit_pwr = transmit_pwr
-        self.processing_pwr = processing_pwr
         self.distances = node_dist
+
+    def setTransmitPwr(self, transmit_pwr):
+        self.transmit_pwr = transmit_pwr
+
+    def setProcPower(self, processing_pwr):
+        self.processing_pwr = processing_pwr
 
 class Graph(): 
 
@@ -43,35 +51,51 @@ class Graph():
 
         print("GRAPH:" , self.graph)
 
-# takes in nodes 
-# returns network layout
+# takes in nodes; returns network 'layout'
 # can use this function to update/change the layout as energy depletes
+# or transmission power changes greatly because one of the nodes died/ran out of energy
 def layout(nodes):
 
     hub = nodes[0]
+    proximity = 100
     one_hop = []
+    # adds up all the vals in each node's distance vector to see which node
+    # is closest to the most nodes (the smallest sum means it's closest) and
+    # will therefore use the least transmit pwr overall and serve as a good
+    # initial hub
     for n in nodes:
-        if n.transmit_pwr > hub.transmit_pwr:
+        temp = 0
+        for d in n.distances:
+            temp += d
+        # just an idea on how to init transmit power for all nodes so that
+        # nodes close to a lot of others end up using less transmit pwr
+        # like they're supposed to 
+        n.setTransmitPwr(float(temp) / float(len(nodes))) # set transmit pwr to average dist from other nodes
+        if temp < proximity:
             hub = n
-        else:
+            proximity = temp
+    for n in nodes: # all other nodes become one-hop nodes
+        if n != hub:
             one_hop.append(n)
-
+    printBatteryLevels(nodes)
     return hub, one_hop
 
+# TO-DO: we need to add something in the sendPacket function or maybe outside when we call it
+# to check for some threshold being hit to where we'd wanna change the layout. I'm thinking the
+# threshold would be one of the nodes having low energy (let's say energy=2) so we'd call layout
+# to a) change it from hub to one-hop if it's a hub to start or b) perhaps create another hub, one
+# much closer to the dying node so that it can continue to send packets at a lower transmission
+# power
+
 # 'runs' the network / starts sending packets
-def sendPackets(hub, one_hop, dest):
+def sendPacket(hub, one_hop, src, dest):
 
     packets = 0 # var for how many packets were sent before failure
-<<<<<<< Updated upstream
-
-    # parameter is how many vertices (nodes)
-    #g = Graph(2)
-    # node 0 can go to node 1
-=======
     packet_size = 512 # let's say all packets being sent are of size 512 B
 
     # there is only one hub to start so it's the only one that can go
     # to destination, all the other nodes can only send info to hub
+    #divider for line 99, 105 orig. 1000
     hub.energy -= (packet_size * (hub.transmit_pwr / 1000))
     if src != hub.id:
         for n in one_hop:
@@ -82,7 +106,6 @@ def sendPackets(hub, one_hop, dest):
                 # make sure there was enough energy to send it
                 if n.energy >= 0 and hub.energy >= 0:
                     packets +=1 # energy left >= 0 so packet was sent successfully
-            printBatteryLevels(hub)
     else:
         if hub.energy >= 0:
             packets += 1
@@ -91,23 +114,34 @@ def sendPackets(hub, one_hop, dest):
     # would be multiple routes to dest
     #g = Graph(5)
     # add path from node 0 to node 1
->>>>>>> Stashed changes
     #g.addEdge(0,1)
     #s = 0 ; d = 1
     #g.printAllPaths(s, d)
 
     return packets
 
+def printBatteryLevels(nodes):
+    print("Sensor #\tBattery Level")
+    for n in nodes:
+        print(n.id, n.energy, sep="\t\t")
+
+def checkLevels(nodes):
+    aliveNodes = 0
+    for n in nodes:
+        if n.energy > 0:
+            aliveNodes += 1
+    return aliveNodes
+
 # destination / gateway variable
 # val at each index is dest's dist from node (node # = index)
 dest = [2, 10, 12, 3]
 
-# sensor nodes - I set processing_pwr to 0 for all of them 
-# cuz i haven't implement it yet
-n0 = Node(10, 5, 0, [0, 2, 3, 5])
-n1 = Node(8, 5, 0, [2, 0, 2, 6])
-n2 = Node(3, 3, 0, [3, 2, 0, 10])
-n3 = Node(8, 5, 0, [5, 6, 10, 0])
+# sensor nodes - initialized with distances to other nodes and
+# all start with same amount of energy
+n0 = Node(0, 10, [0, 2, 3, 5])
+n1 = Node(1, 10, [2, 0, 2, 6])
+n2 = Node(2, 10, [3, 2, 0, 10])
+n3 = Node(3, 10, [5, 6, 10, 0])
 
 # list of nodes so it's easy to pass them to a function
 nodes = [n0, n1, n2, n3]
@@ -117,4 +151,20 @@ hub, one_hop = layout(nodes)
 
 # start sending packets
 total_packets = 0
-total_packets.append(sendPackets(hub, one_hop))
+
+# TO-DO: put random generation of src node and calling of sendPacket into a loop
+# that breaks once no more packets can be sent aka all the nodes have no energy left
+
+# randomly generated source node
+s = random.randint(0, 3)
+print("Source node: ", s)
+levels = checkLevels(nodes)
+p = 0
+#while(levels > 0):
+for x in range(10):
+    p += sendPacket(hub, one_hop, s, dest)
+    print("Overall packets transmitted: ", p)
+    levels = checkLevels(nodes)
+
+print("\nAfter sending packets...\n")
+printBatteryLevels(nodes)
