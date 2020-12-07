@@ -98,6 +98,7 @@ def sendPacket(hub, one_hop, src, dest):
     # there is only one hub to start so it's the only one that can go
     # to destination, all the other nodes can only send info to hub
     hub.energy -= (packet_size * (hub.transmit_pwr / 1000))
+    print ("HUB ENERGY IS NOW: ", hub.energy)
     if src != hub.id:
 
         # Going through each one_hop
@@ -157,6 +158,7 @@ nodes = [n0, n1, n2, n3]
 
 # create initial network layout
 hub, one_hop = layout(nodes)
+print ("FIRST HUB IS: ", hub.id)
 
 # Change node's hub id to valid as it is a hub now
 nodes[hub.id].hubID = 1
@@ -181,6 +183,8 @@ print ("INITIAL SOURCE: ", s)
 usedHubs  = []
 usedSources = []
 
+usedHubs.append(hub.id)
+
 
 
 # Check if all nodes are usable
@@ -192,26 +196,29 @@ while (continueFlag == True):
         continueFlag = False
         print ("ALL SOURCES SUCK")
     else:
-        # 2 is our threshold
-        if (nodes[s].energy > 2):
+        # 2 is our threshold, both the source and hub can send
+        if (nodes[s].energy > 2 and hub.energy > 2):
             p = sendPacket(hub, one_hop, s, dest)
             usedSources.append(s)
+            usedHubs.append(hub.id)
             total_packets += 1
         # Change source node to something else, can also be a hub
         else:
             # 
             canUse = True
             while (canUse == True):
-                if (s in usedSources):
+                if (s in usedSources and s in usedHubs):
                     # Cant use this one since it's already been used
                     pass
                 s = random.randint(0,3)
+                hubInt = random.randint(0,3)
+                hub = nodes[hubInt]
                 canUse = False
 
         print ("ALL USED :" , usedSources)
         # If 0 is not present in usedSources, it means it used up energy as a hub, will configure
         # this in a bit
-        
-        # Also check if hub needs to be switched if it reaches a threshold
             
 print ("PACKETS SENT: ", total_packets)
+for i in range(0, len(nodes)):
+    print (nodes[i].energy)
