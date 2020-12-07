@@ -64,6 +64,7 @@ def layout(nodes):
     # will therefore use the least transmit pwr overall and serve as a good
     # initial hub
     for n in nodes:
+        print ("PROXIMITY IS: ", proximity)
         temp = 0
         for d in n.distances:
             temp += d
@@ -97,6 +98,10 @@ def sendPacket(hub, one_hop, src, dest):
     # to destination, all the other nodes can only send info to hub
     hub.energy -= (packet_size * (hub.transmit_pwr / 1000))
     if src != hub.id:
+        print ("SRC: ",src)
+        print ("HUB ID: ", hub.id)
+
+        # Going through each one_hop
         for n in one_hop:
             # find which node is source
             if src == n.id:
@@ -119,6 +124,18 @@ def sendPacket(hub, one_hop, src, dest):
 
     return packets
 
+def checkNodeEnergy(nodes):
+    counter = 0
+    for i in range(0, len(nodes)):
+        if (nodes[i].energy > 2):
+            counter += 1
+
+    # Then all nodes have enough power
+    if (counter == len(nodes)):
+        return True
+    else:
+        return False
+
 # destination / gateway variable
 # val at each index is dest's dist from node (node # = index)
 dest = [2, 10, 12, 3]
@@ -136,6 +153,7 @@ nodes = [n0, n1, n2, n3]
 # create initial network layout
 hub, one_hop = layout(nodes)
 
+
 # start sending packets
 total_packets = 0
 
@@ -143,7 +161,28 @@ total_packets = 0
 # that breaks once no more packets can be sent aka all the nodes have no energy left
 
 # randomly generated source node
+
 s = random.randint(0, 3)
-print(s)
-p = sendPacket(hub, one_hop, s, dest)
-print(p)
+
+# if (nodes[s].id != one_hop):
+    # Then it's a hub
+
+# Keep track of one hops and hubs
+usedHubs  = []
+
+# Loop sending packets until layout(), when hub.energy < 2 and one_hop.energy < 2
+# Sample loop, change this to something better (when no energy is left in all nodes)
+
+# Check if all nodes are usable
+continueFlag = True
+
+while (continueFlag == True):
+    # Make sure source power is good, if good then we can use it, else pick another node
+    if (checkNodeEnergy(nodes) == False):
+        continueFlag = False
+    else:
+        if (nodes[s].energy > 2):
+            print ("SIZE: ", nodes[s].energy)
+            print(s)
+            p = sendPacket(hub, one_hop, s, dest)
+            print (p)
