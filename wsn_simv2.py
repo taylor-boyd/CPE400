@@ -1,4 +1,5 @@
 from collections import defaultdict 
+import copy
 
 # IDEA 2
 # Get all possible routes from source to destination
@@ -12,6 +13,7 @@ from collections import defaultdict
 # From here
 # https://www.geeksforgeeks.org/find-paths-given-source-destination/
 # Should probably change so we aren't accused of cheating LOL
+
 
 class Node():
 
@@ -34,7 +36,8 @@ def printAllPathsUtil(u, d, visited, path):
     
     # If node equals destination
     if u == d:
-        print (path)
+        print("JUICER: ", path)
+        juicyList.append(copy.copy(path))
     else:
         
         # Add path if the node hasn't been visited from source to dest
@@ -135,6 +138,7 @@ nodesDistanceList.append(n0.distances)
 nodesDistanceList.append(n1.distances)
 nodesDistanceList.append(n2.distances)
 nodesDistanceList.append(n3.distances)
+juicyList = []
 
 possiblePaths = [[]]
 printAllPaths(Source,Destination)
@@ -144,6 +148,7 @@ print ("GRAPH IS: ", graph)
 # getOptimalPaths(nodesDistanceList,0, 3)
 
 
+print ("PLEASE: ", juicyList)
 # create initial network layout
 network = layout(nodes)
 hub, one_hop = layout(nodes)
