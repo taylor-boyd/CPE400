@@ -5,9 +5,10 @@ from collections import defaultdict
 # the node class so that we can begin to implement RREQ stuff
 class Node():
 
-    def __init__(self, id, energy, node_dist):
+    def __init__(self, id, energy, hubID, node_dist):
         self.id = id
         self.energy = energy
+        self.hubID = hubID
         self.distances = node_dist
 
     def setTransmitPwr(self, transmit_pwr):
@@ -98,8 +99,6 @@ def sendPacket(hub, one_hop, src, dest):
     # to destination, all the other nodes can only send info to hub
     hub.energy -= (packet_size * (hub.transmit_pwr / 1000))
     if src != hub.id:
-        print ("SRC: ",src)
-        print ("HUB ID: ", hub.id)
 
         # Going through each one_hop
         for n in one_hop:
@@ -110,6 +109,8 @@ def sendPacket(hub, one_hop, src, dest):
                 # make sure there was enough energy to send it
                 if n.energy >= 0 and hub.energy >= 0:
                     packets +=1 # energy left >= 0 so packet was sent successfully
+
+    # If it's the src is the hub
     else:
         if hub.energy >= 0:
             packets += 1
@@ -131,10 +132,14 @@ def checkNodeEnergy(nodes):
             counter += 1
 
     # Then all nodes have enough power
-    if (counter == len(nodes)):
+    if (counter > 0):
         return True
-    else:
+    # No nodes have good enough power
+    elif (counter == 0):
         return False
+
+    return False
+
 
 # destination / gateway variable
 # val at each index is dest's dist from node (node # = index)
@@ -142,16 +147,19 @@ dest = [2, 10, 12, 3]
 
 # sensor nodes - initialized with distances to other nodes and
 # all start with same amount of energy
-n0 = Node(0, 10, [0, 2, 3, 5])
-n1 = Node(1, 10, [2, 0, 2, 6])
-n2 = Node(2, 10, [3, 2, 0, 10])
-n3 = Node(3, 10, [5, 6, 10, 0])
+n0 = Node(0, 10, 0, [0, 2, 3, 5])
+n1 = Node(1, 10, 0, [2, 0, 2, 6])
+n2 = Node(2, 10, 0, [3, 2, 0, 10])
+n3 = Node(3, 10, 0, [5, 6, 10, 0])
 
 # list of nodes so it's easy to pass them to a function
 nodes = [n0, n1, n2, n3]
 
 # create initial network layout
 hub, one_hop = layout(nodes)
+
+# Change node's hub id to valid as it is a hub now
+nodes[hub.id].hubID = 1
 
 
 # start sending packets
@@ -163,26 +171,47 @@ total_packets = 0
 # randomly generated source node
 
 s = random.randint(0, 3)
+print ("INITIAL SOURCE: ", s)
 
+# Ignore this for now
 # if (nodes[s].id != one_hop):
     # Then it's a hub
 
 # Keep track of one hops and hubs
 usedHubs  = []
+usedSources = []
 
-# Loop sending packets until layout(), when hub.energy < 2 and one_hop.energy < 2
-# Sample loop, change this to something better (when no energy is left in all nodes)
+
 
 # Check if all nodes are usable
 continueFlag = True
 
 while (continueFlag == True):
-    # Make sure source power is good, if good then we can use it, else pick another node
+    # Make sure source power for all nodes is good, if good then we can use it, else pick another node
     if (checkNodeEnergy(nodes) == False):
         continueFlag = False
+        print ("ALL SOURCES SUCK")
     else:
+        # 2 is our threshold
         if (nodes[s].energy > 2):
-            print ("SIZE: ", nodes[s].energy)
-            print(s)
             p = sendPacket(hub, one_hop, s, dest)
-            print (p)
+            usedSources.append(s)
+            total_packets += 1
+        # Change source node to something else, can also be a hub
+        else:
+            # 
+            canUse = True
+            while (canUse == True):
+                if (s in usedSources):
+                    # Cant use this one since it's already been used
+                    pass
+                s = random.randint(0,3)
+                canUse = False
+
+        print ("ALL USED :" , usedSources)
+        # If 0 is not present in usedSources, it means it used up energy as a hub, will configure
+        # this in a bit
+        
+        # Also check if hub needs to be switched if it reaches a threshold
+            
+print ("PACKETS SENT: ", total_packets)
