@@ -62,10 +62,36 @@ def layout(nodes):
 def sendPackets(hub, one_hop, dest):
 
     packets = 0 # var for how many packets were sent before failure
+<<<<<<< Updated upstream
 
     # parameter is how many vertices (nodes)
     #g = Graph(2)
     # node 0 can go to node 1
+=======
+    packet_size = 512 # let's say all packets being sent are of size 512 B
+
+    # there is only one hub to start so it's the only one that can go
+    # to destination, all the other nodes can only send info to hub
+    hub.energy -= (packet_size * (hub.transmit_pwr / 1000))
+    if src != hub.id:
+        for n in one_hop:
+            # find which node is source
+            if src == n.id:
+                # update energy left after packet is sent
+                n.energy -= (packet_size * (n.transmit_pwr / 1000))
+                # make sure there was enough energy to send it
+                if n.energy >= 0 and hub.energy >= 0:
+                    packets +=1 # energy left >= 0 so packet was sent successfully
+            printBatteryLevels(hub)
+    else:
+        if hub.energy >= 0:
+            packets += 1
+
+    # this would be used if we had more than one hub because there 
+    # would be multiple routes to dest
+    #g = Graph(5)
+    # add path from node 0 to node 1
+>>>>>>> Stashed changes
     #g.addEdge(0,1)
     #s = 0 ; d = 1
     #g.printAllPaths(s, d)
