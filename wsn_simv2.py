@@ -1,20 +1,32 @@
 import random
 from collections import defaultdict 
+from numpy.random import randint
+import numpy as np
+import math
 
-# TO-DO: Add a routing table (probably should just be a list of lists to keep it simple) to 
-# the node class so that we can begin to implement RREQ stuff
 class Node():
 
-    def __init__(self, id, energy, node_dist):
+    def __init__(self, id, energy, location):
         self.id = id
         self.energy = energy
-        self.distances = node_dist
+        self.location = location
+        self.routing_tbl = []
+        self.hubID = -1
 
     def setTransmitPwr(self, transmit_pwr):
         self.transmit_pwr = transmit_pwr
 
     def setProcPower(self, processing_pwr):
         self.processing_pwr = processing_pwr
+
+    def setHub(self, hubID):
+        self.hubID = hubID
+
+    # route entry will look like this: [seq.#, # of hops / energy it'll take, path]
+    # # of hops / energy it'll take can def change to some other measurement of path cost
+    # path will be a list so like 0 > 1 > 2 would be [0,1,2]
+    def addRoute(self, route):
+        routing_tbl.append(route)
 
 class Graph(): 
 
@@ -51,34 +63,125 @@ class Graph():
 
         print("GRAPH:" , self.graph)
 
-# takes in nodes; returns network 'layout'
+# Function calculates distance between two points
+def dist(p1, p2, d): 
+      
+    x = []
+    for i in range(d):
+        x.append(p1[i] - p2[i])
+        
+    tot = 0
+    for i in range(d):
+        tot = tot + (x[i] * x[i])
+        
+    return tot
+
+# Function to find the min dist between any 2 pnts
+def minDist(t, p, d):
+    
+    n = len(t)
+    index = 0
+    
+    # Iterate over all possible pairs
+    minm = 100
+    for i in range(n):
+        # Update minm and index
+        di = dist(t[i], p, d)
+        if di < minm:
+            minm = di
+            index = i
+    
+    # Return index of closest cluster center
+    return index
+
+def new_centers(c):
+
+    a = []
+    for i in range(len(c)):
+        d = len(c[i])
+    for i in range(d):
+        a.append([])
+    for i in range(len(c)):
+        for j in range(d):
+            a[j] += c[i][j]
+            
+    for i in range(len(a)):
+        a[i] = a[i] / len(c)
+        
+    return a
+
+def helper_function(X,mu):
+    
+    clusters = []
+    cc_final = []
+    for i in range(len(mu)):
+        clusters.append([])
+    for i in range(len(X)):
+        for j in range(len(X[i])):
+            center = minDist(mu, X[i][j], len(X[i][j]))
+            clusters[center].append(X[i][j])
+    for i in range(len(clusters)):
+        cc_final.append(new_centers(clusters[i]))
+        
+    return clusters
+
+def K_Means(X,K):
+    
+    # variable for returned final cluster centers
+    cc_final = np.array([])
+    
+    maxm = minm = X[0][0]
+    d = 0 # point dimensions
+    for i in range(len(X)):
+        d = len(X[i])
+        for j in range(d):
+            maxm = max(maxm, X[i][j])
+            minm = min(minm, X[i][j])
+    cc_initial = []
+    for i in range(K):
+        cc_initial.append(randint(minm,maxm,d))
+    
+    c_final = []
+    centers = []
+    for i in range(len(cc_initial)):
+        c_final.append([])
+    for i in range(len(X)):
+        center = minDist(mu, X[i], len(X[i]))
+        c_final[center].append(X[i])
+    c_final = helper_function(c_final, cc_initial)
+            
+    return c_final
+
+# takes in nodes, dest, and k (num of clusters); returns network 'layout'
 # can use this function to update/change the layout as energy depletes
 # or transmission power changes greatly because one of the nodes died/ran out of energy
-def layout(nodes):
+def layout(nodes, dest, k):
 
-    hub = nodes[0]
-    proximity = 100
-    one_hop = []
-    # adds up all the vals in each node's distance vector to see which node
-    # is closest to the most nodes (the smallest sum means it's closest) and
-    # will therefore use the least transmit pwr overall and serve as a good
-    # initial hub
-    for n in nodes:
-        temp = 0
-        for d in n.distances:
-            temp += d
-        # just an idea on how to init transmit power for all nodes so that
-        # nodes close to a lot of others end up using less transmit pwr
-        # like they're supposed to 
-        n.setTransmitPwr(float(temp) / float(len(nodes))) # set transmit pwr to average dist from other nodes
-        if temp < proximity:
-            hub = n
-            proximity = temp
-    for n in nodes: # all other nodes become one-hop nodes
-        if n != hub:
-            one_hop.append(n)
-
-    return hub, one_hop
+    node_locs = np.zeros(shape=(len(nodes)+1, 2))
+    for n in range(len(nodes)):
+        node_locs[n] = nodes[n].location
+    node_locs[len(nodes)] = dest
+    clusters = K_Means(node_locs, k)
+    
+    for c in clusters:
+        h = c[0] # initialize h with possible hub for cluster c
+        proximity = 100
+        for i in range(len(c)):
+            temp = 0
+            for j in range(len(c)):
+                temp += dist(c[i], c[j], 2)
+            for n in nodes:
+                if np.all(n.location == c[i]):
+                    n.setTransmitPwr(float(temp) / float(len(nodes)))
+            if temp < proximity:
+                proximity = temp
+                for n in nodes:
+                    if np.all(n.location == c[i]):
+                        h = n
+        for l in c:
+            for n in nodes:
+                if np.all(n.location == l):
+                    n.setHub(h.id)
 
 # TO-DO: we need to add something in the sendPacket function or maybe outside when we call it
 # to check for some threshold being hit to where we'd wanna change the layout. I'm thinking the
@@ -119,22 +222,37 @@ def sendPacket(hub, one_hop, src, dest):
 
     return packets
 
-# destination / gateway variable
-# val at each index is dest's dist from node (node # = index)
-dest = [2, 10, 12, 3]
+# destination / gateway location
+dest = [5, 6]
 
-# sensor nodes - initialized with distances to other nodes and
+# sensor nodes - initialized with node locations and they'll
 # all start with same amount of energy
-n0 = Node(0, 10, [0, 2, 3, 5])
-n1 = Node(1, 10, [2, 0, 2, 6])
-n2 = Node(2, 10, [3, 2, 0, 10])
-n3 = Node(3, 10, [5, 6, 10, 0])
+n0 = Node(0, 10, [3, 5])
+n1 = Node(1, 10, [3, 1])
+n2 = Node(2, 10, [1, 3])
+n3 = Node(3, 10, [6, 3])
 
 # list of nodes so it's easy to pass them to a function
 nodes = [n0, n1, n2, n3]
 
 # create initial network layout
-hub, one_hop = layout(nodes)
+layout(nodes, dest, 2)
+print("CLUSTER 1:")
+print("Hub is n" + str(nodes[0].hubID))
+print("One-hop nodes are: ")
+other_hub = 0
+for n in nodes:
+    if n.hubID == nodes[0].hubID and n.id != nodes[0].hubID:
+        print("n" + str(n.id) + " ")
+    elif n.hubID != nodes[0].hubID:
+        other_hub = n.hubID
+print("")
+print("CLUSTER 2:")
+print("Hub is n" + str(other_hub))
+print("One-hop nodes are: ")
+for n in nodes:
+    if n.hubID == other_hub and n.id != other_hub:
+        print("n" + str(n.id) + " ")
 
 # start sending packets
 total_packets = 0
@@ -144,6 +262,6 @@ total_packets = 0
 
 # randomly generated source node
 s = random.randint(0, 3)
-print(s)
-p = sendPacket(hub, one_hop, s, dest)
-print(p)
+#print(s)
+#p = sendPacket(hub, one_hop, s, dest)
+#print(p)
